@@ -59,6 +59,18 @@ module Soup
 			}
 		end
 
+		def guint:send(SoupMessage *msg)
+			return soup_session_send_message(_self, msg);
+		end
+
+		def pause(SoupMessage *msg)
+			soup_session_pause_message(_self, msg);
+		end
+
+		def unpause(SoupMessage *msg)
+			soup_session_unpause_message(_self, msg);
+		end
+
 		def abort
 			soup_session_abort(_self);
 		end
@@ -86,6 +98,18 @@ module Soup
 		def initialize(char * method, char * uri)
 			INIT(self, soup_message_new(method, uri));
 		end
+		
+		def set_request_header(char *name, char *value)
+			soup_message_headers_replace(_self->request_headers, name, value);
+		end
+
+		def unset_request_header(char *name)
+			soup_message_headers_remove(_self->request_headers, name);
+		end
+
+		def set_request_body(char *type, T_STRING body)
+			soup_message_set_request(_self, type, SOUP_MEMORY_COPY, RSTRING_PTR(body), RSTRING_LEN(body));
+		end
 
 		def char *:get_response_header(char *name)
 			return soup_message_headers_get_one(_self->response_headers, name);
@@ -96,7 +120,7 @@ module Soup
 			rb_need_block();
 			soup_message_headers_foreach(_self->response_headers, each_header, (gpointer)block);
 		end
-
+		
 		def response_body
 			SoupBuffer *buffer = soup_message_body_flatten(_self->response_body);
 			volatile VALUE str = rb_str_new(buffer->data, buffer->length);
