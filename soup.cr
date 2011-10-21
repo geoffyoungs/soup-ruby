@@ -7,7 +7,7 @@
 
 #define INIT(obj, gobj) __my_init(obj, G_OBJECT(gobj))
 
-static inline __my_init(VALUE obj, GObject *gobj) {
+static inline void __my_init(VALUE obj, GObject *gobj) {
 	g_object_ref(gobj);
 	g_object_ref_sink(gobj);
 	G_INITIALIZE(obj, gobj);
