@@ -31,7 +31,8 @@ spec = Gem::Specification.new do |s|
 	s.add_dependency("rubber-generate", ">= 0.0.17")
 	s.platform = Gem::Platform::RUBY
 	s.extensions = FileList["ext/*/extconf.rb"]
-	s.files = FileList['ext/*/*.{c,h,cr,rd}'] + ['Rakefile', 'README.md'] + FileList['lib/**/*.rb']
+  s.licenses = ['The Ruby License']
+	s.files = FileList['ext/*/*.{c,h,cr,rd,rb}'] + ['Rakefile', 'README.md'] + FileList['lib/**/*.rb']
 s.description = <<-EOF
 Libsoup bindings for ruby.  Partial coverage sufficient to allow HTTP requests to be handled without blocking the mainloop.
 
