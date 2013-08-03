@@ -93,7 +93,7 @@ module Soup
 		end
 	end
 
-  gflags Flags SOUP_MESSAGE_FLAGS SOUP_MESSAGE_;
+  flags MessageFlags (SOUP_MESSAGE_NO_REDIRECT, SOUP_MESSAGE_CAN_REBUILD, SOUP_MESSAGE_CONTENT_DECODED, SOUP_MESSAGE_CERTIFICATE_TRUSTED, SOUP_MESSAGE_NEW_CONNECTION, SOUP_MESSAGE_IDEMPOTENT)
 
 	gobject Message < SOUP_TYPE_MESSAGE
 		@type SoupMessage
@@ -133,11 +133,11 @@ module Soup
       return soup_message_is_keepalive(_self);
     end
 
-    def flags=(SoupMessageFlags flags)
+    def flags=(MessageFlags flags)
       soup_message_set_flags(_self, flags);
     end
 
-    def SoupMessageFlags:flags
+    def MessageFlags:flags
       return soup_message_get_flags(_self);
     end
 

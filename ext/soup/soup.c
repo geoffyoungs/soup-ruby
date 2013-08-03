@@ -50,6 +50,243 @@ static VALUE
 URI_initialize(VALUE self, VALUE __v_uri_string);
 static VALUE
 URI_to_s(VALUE self);
+static VALUE flagsMessageFlags;
+
+static VALUE flagsBaseClass;
+
+typedef struct {
+	int value;
+	char *name;
+	char *fullname;
+} FlagsData;
+
+static VALUE make_flags_value(VALUE klass, int value, char *name, char *fullname)
+{
+	FlagsData *data = NULL;
+	
+	data = ALLOC(FlagsData);
+	data->value = value;
+	data->name = name;
+	data->fullname = fullname;
+	
+	return Data_Wrap_Struct(klass, NULL, free, data);
+}
+static int flags_value_to_int(VALUE value, VALUE klass)
+{
+	switch (TYPE(value))
+	{
+	case T_FIXNUM:
+	case T_FLOAT:
+		return NUM2INT(value);
+	break;
+	case T_DATA:
+		if (rb_obj_is_kind_of(value, flagsBaseClass))
+		{
+			FlagsData *data = NULL;
+			
+			if ((klass != Qnil) && (!rb_obj_is_kind_of(value, klass)))
+			{
+				rb_raise(rb_eTypeError, "Wrong type of flags  %s (%s required)", rb_obj_classname(value), rb_class2name(klass));
+			}
+			
+			Data_Get_Struct(value, FlagsData, data);
+			return data->value;
+		}
+	break;
+	}
+	return 0;
+	
+}
+
+static VALUE rubber_flags_inspect(VALUE value)
+{
+	FlagsData *data = NULL;
+	volatile VALUE str = rb_str_new("#<", 2);
+	char number[16] = ""; 
+	
+	Data_Get_Struct(value, FlagsData, data);
+	
+	rb_str_cat2(str, rb_obj_classname(value));
+	rb_str_cat2(str, " - ");
+	rb_str_cat2(str, data->name);
+	rb_str_cat2(str, "(");
+	sprintf(number, "%i", data->value);
+	rb_str_cat2(str, number);
+	rb_str_cat2(str, ")>");
+	
+	return str;
+}
+
+static VALUE rubber_flags_to_s(VALUE value)
+{
+	FlagsData *data = NULL;
+	
+	Data_Get_Struct(value, FlagsData, data);
+	
+	return rb_str_new2(data->fullname);
+}
+static VALUE rubber_flags_name(VALUE value)
+{
+	FlagsData *data = NULL;
+	
+	Data_Get_Struct(value, FlagsData, data);
+	
+	return rb_str_new2(data->name);
+}
+
+static VALUE rubber_flags_cmp(VALUE value, VALUE other)
+{
+	VALUE a,b;
+	a = rb_funcall(value, rb_intern("to_i"), 0);
+	b = rb_funcall(other, rb_intern("to_i"), 0);
+#ifdef RB_NUM_COERCE_FUNCS_NEED_OPID
+	return rb_num_coerce_cmp(a, b, rb_intern("=="));
+#else
+	return rb_num_coerce_cmp(a, b);
+#endif
+}
+
+static VALUE rubber_flags_to_i(VALUE value)
+{
+	FlagsData *data = NULL;
+	
+	Data_Get_Struct(value, FlagsData, data);
+	
+	return INT2FIX(data->value);
+}
+
+static VALUE rubber_flags_coerce(VALUE value, VALUE other)
+{
+	FlagsData *data = NULL;
+	
+	Data_Get_Struct(value, FlagsData, data);
+	
+	switch(TYPE(other))
+	{
+	case T_FIXNUM:
+	case T_BIGNUM:
+		return INT2FIX(data->value);
+	case T_FLOAT:
+		return Qnil;
+	default:
+		return Qnil;
+	}
+}
+
+static VALUE rubber_flags_and(VALUE value, VALUE other)
+{
+	FlagsData *data = NULL;
+	int original = 0;
+	int other_num = 0;
+	
+	Data_Get_Struct(value, FlagsData, data);
+
+	original = data->value;
+
+	other_num = flags_value_to_int(value, CLASS_OF(value));
+	
+//	return INT2NUM(original & other_num);
+	return make_flags_value(CLASS_OF(value), original & other_num, "", "");
+}
+
+static VALUE rubber_flags_or(VALUE value, VALUE other)
+{
+	FlagsData *data = NULL;
+	int original = 0;
+	int other_num = 0;
+	
+	Data_Get_Struct(value, FlagsData, data);
+
+	original = data->value;
+
+	other_num = flags_value_to_int(value, CLASS_OF(value));
+	
+	return make_flags_value(CLASS_OF(value), original | other_num, "", "");
+}
+
+
+
+static VALUE flagsMessageFlags_SOUP_MESSAGE_NO_REDIRECT = Qnil;
+static VALUE flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD = Qnil;
+static VALUE flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED = Qnil;
+static VALUE flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED = Qnil;
+static VALUE flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION = Qnil;
+static VALUE flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT = Qnil;
+	static VALUE rubber_flagsMessageFlags_flags_inspect(VALUE value)
+{
+	FlagsData *data = NULL;
+	volatile VALUE str = rb_str_new("#<", 2);
+	char number[16] = ""; 
+	int c=0;
+	
+	Data_Get_Struct(value, FlagsData, data);
+	
+	rb_str_cat2(str, rb_obj_classname(value));
+	rb_str_cat2(str, " - ");
+		if ((data->value & SOUP_MESSAGE_NO_REDIRECT)==SOUP_MESSAGE_NO_REDIRECT) {
+			if (c>0)
+				rb_str_cat2(str, ", ");
+			rb_str_cat2(str, "no-redirect");
+			c ++;
+		}
+		if ((data->value & SOUP_MESSAGE_CAN_REBUILD)==SOUP_MESSAGE_CAN_REBUILD) {
+			if (c>0)
+				rb_str_cat2(str, ", ");
+			rb_str_cat2(str, "can-rebuild");
+			c ++;
+		}
+		if ((data->value & SOUP_MESSAGE_CONTENT_DECODED)==SOUP_MESSAGE_CONTENT_DECODED) {
+			if (c>0)
+				rb_str_cat2(str, ", ");
+			rb_str_cat2(str, "content-decoded");
+			c ++;
+		}
+		if ((data->value & SOUP_MESSAGE_CERTIFICATE_TRUSTED)==SOUP_MESSAGE_CERTIFICATE_TRUSTED) {
+			if (c>0)
+				rb_str_cat2(str, ", ");
+			rb_str_cat2(str, "certificate-trusted");
+			c ++;
+		}
+		if ((data->value & SOUP_MESSAGE_NEW_CONNECTION)==SOUP_MESSAGE_NEW_CONNECTION) {
+			if (c>0)
+				rb_str_cat2(str, ", ");
+			rb_str_cat2(str, "new-connection");
+			c ++;
+		}
+		if ((data->value & SOUP_MESSAGE_IDEMPOTENT)==SOUP_MESSAGE_IDEMPOTENT) {
+			if (c>0)
+				rb_str_cat2(str, ", ");
+			rb_str_cat2(str, "idempotent");
+			c ++;
+		}
+	rb_str_cat2(str, " (");
+	sprintf(number, "%i", data->value);
+	rb_str_cat2(str, number);
+	rb_str_cat2(str, ")>");
+	
+	return str;
+}
+typedef int MessageFlags;
+#ifdef __GNUC__
+// No point in declaring these unless we're using GCC
+// They're ahead of any code that uses them anyway.
+static VALUE flags_MessageFlags_to_ruby(int value)
+__attribute__ ((unused))
+;
+static int flags_ruby_to_MessageFlags(VALUE val)
+__attribute__ ((unused))
+;
+#endif
+
+static VALUE flags_MessageFlags_to_ruby(int value) { switch(value) {
+    case SOUP_MESSAGE_NO_REDIRECT: return flagsMessageFlags_SOUP_MESSAGE_NO_REDIRECT;
+    case SOUP_MESSAGE_CAN_REBUILD: return flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD;
+    case SOUP_MESSAGE_CONTENT_DECODED: return flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED;
+    case SOUP_MESSAGE_CERTIFICATE_TRUSTED: return flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED;
+    case SOUP_MESSAGE_NEW_CONNECTION: return flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION;
+    case SOUP_MESSAGE_IDEMPOTENT: return flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT;
+	}; return make_flags_value(flagsMessageFlags, value, "various", "Various"); }
+	static int flags_ruby_to_MessageFlags(VALUE val) { return flags_value_to_int(val, flagsMessageFlags); }
 static VALUE cMessage;
 static VALUE
 Message_initialize(VALUE self, VALUE __v_method, VALUE __v_uri);
@@ -357,9 +594,9 @@ out:
 static VALUE
 Message_flags_equals(VALUE self, VALUE __v_flags)
 {
-  SoupMessageFlags flags; SoupMessageFlags __orig_flags;
+  MessageFlags flags; MessageFlags __orig_flags;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
-  __orig_flags = flags = RVAL2GFLAGS(__v_flags, SOUP_MESSAGE_FLAGS);
+  __orig_flags = flags = flags_ruby_to_MessageFlags((__v_flags));
 
 #line 136 "/home/geoff/Projects/soup/ext/soup/soup.cr"
   soup_message_set_flags(_self, flags);
@@ -374,7 +611,7 @@ Message_flags(VALUE self)
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
 
 #line 140 "/home/geoff/Projects/soup/ext/soup/soup.cr"
-  do { __p_retval = GFLAGS2RVAL(soup_message_get_flags(_self), SOUP_MESSAGE_FLAGS); goto out; } while(0);
+  do { __p_retval = flags_MessageFlags_to_ruby((soup_message_get_flags(_self))); goto out; } while(0);
 out:
   return __p_retval;
 }
@@ -475,8 +712,38 @@ Init_soup(void)
   cURI = G_DEF_CLASS(SOUP_TYPE_URI, "URI", mSoup);
   rb_define_method(cURI, "initialize", URI_initialize, 1);
   rb_define_method(cURI, "to_s", URI_to_s, 0);
-  G_DEF_CLASS(SOUP_MESSAGE_FLAGS, "Flags", mSoup);
-  G_DEF_CONSTANTS(mSoup, SOUP_MESSAGE_FLAGS, "SOUP_MESSAGE_");
+  flagsBaseClass = rb_define_class("Flags", rb_cObject);
+    rb_define_method(flagsBaseClass, "inspect", rubber_flags_inspect, 0);
+    rb_define_method(flagsBaseClass, "to_i", rubber_flags_to_i, 0);
+    rb_define_method(flagsBaseClass, "coerce", rubber_flags_coerce, 1);
+    rb_define_method(flagsBaseClass, "to_s", rubber_flags_to_s, 0);
+    rb_define_method(flagsBaseClass, "to_str", rubber_flags_to_s, 0);
+    rb_define_method(flagsBaseClass, "fullname", rubber_flags_to_s, 0);
+    rb_define_method(flagsBaseClass, "name", rubber_flags_name, 0);
+    rb_define_method(flagsBaseClass, "<=>", rubber_flags_cmp, 0);
+    rb_define_method(flagsBaseClass, "&", rubber_flags_and, 1);
+    rb_define_method(flagsBaseClass, "|", rubber_flags_or, 1);
+    
+  flagsMessageFlags = rb_define_class_under(mSoup, "MessageFlags", flagsBaseClass);
+    rb_define_method(flagsMessageFlags, "inspect", rubber_flagsMessageFlags_flags_inspect, 0);
+    flagsMessageFlags_SOUP_MESSAGE_NO_REDIRECT = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_NO_REDIRECT, "no-redirect", "SOUP_MESSAGE_NO_REDIRECT");
+    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_NO_REDIRECT);
+    rb_define_const(flagsMessageFlags, "NO_REDIRECT", flagsMessageFlags_SOUP_MESSAGE_NO_REDIRECT);
+    flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_CAN_REBUILD, "can-rebuild", "SOUP_MESSAGE_CAN_REBUILD");
+    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD);
+    rb_define_const(flagsMessageFlags, "CAN_REBUILD", flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD);
+    flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_CONTENT_DECODED, "content-decoded", "SOUP_MESSAGE_CONTENT_DECODED");
+    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED);
+    rb_define_const(flagsMessageFlags, "CONTENT_DECODED", flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED);
+    flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_CERTIFICATE_TRUSTED, "certificate-trusted", "SOUP_MESSAGE_CERTIFICATE_TRUSTED");
+    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED);
+    rb_define_const(flagsMessageFlags, "CERTIFICATE_TRUSTED", flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED);
+    flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_NEW_CONNECTION, "new-connection", "SOUP_MESSAGE_NEW_CONNECTION");
+    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION);
+    rb_define_const(flagsMessageFlags, "NEW_CONNECTION", flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION);
+    flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_IDEMPOTENT, "idempotent", "SOUP_MESSAGE_IDEMPOTENT");
+    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT);
+    rb_define_const(flagsMessageFlags, "IDEMPOTENT", flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT);
   cMessage = G_DEF_CLASS(SOUP_TYPE_MESSAGE, "Message", mSoup);
   rb_define_method(cMessage, "initialize", Message_initialize, 2);
   rb_define_method(cMessage, "set_request_header", Message_set_request_header, 2);

@@ -23,7 +23,7 @@
 
 --- Soup::URI#to_s
 
-== flags Soup::Flags
+== flags Soup::MessageFlags
 == class Soup::Message
 --- Soup::Message.new(String method, String uri)
 
@@ -48,7 +48,7 @@
 
 --- Soup::Message#is_keepalive?
 
---- Soup::Message#flags=(SoupMessageFlags flags)
+--- Soup::Message#flags=(MessageFlags flags)
 
 
 --- Soup::Message#flags
