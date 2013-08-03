@@ -93,6 +93,8 @@ module Soup
 		end
 	end
 
+  gflags Flags SOUP_MESSAGE_FLAGS SOUP_MESSAGE_;
+
 	gobject Message < SOUP_TYPE_MESSAGE
 		@type SoupMessage
 		def initialize(char * method, char * uri)
@@ -110,6 +112,34 @@ module Soup
 		def set_request_body(char *type, T_STRING body)
 			soup_message_set_request(_self, type, SOUP_MEMORY_COPY, RSTRING_PTR(body), RSTRING_LEN(body));
 		end
+
+    def set_response(char *content_type, T_STRING body)
+			soup_message_set_response(_self, content_type, SOUP_MEMORY_COPY, RSTRING_PTR(body), RSTRING_LEN(body));
+    end
+
+    def set_status(int status_code, char *reason = NULL)
+      if (reason) {
+        soup_message_set_status_full(_self, status_code, reason);
+      } else {
+        soup_message_set_status(_self, status_code);
+      }
+    end
+
+    def set_redirect(int status_code, char *redirect_uri)
+      soup_message_set_redirect(_self, status_code, redirect_uri);
+    end
+
+    def bool:is_keepalive?
+      return soup_message_is_keepalive(_self);
+    end
+
+    def flags=(SoupMessageFlags flags)
+      soup_message_set_flags(_self, flags);
+    end
+
+    def SoupMessageFlags:flags
+      return soup_message_get_flags(_self);
+    end
 
 		def char *:get_response_header(char *name)
 			return soup_message_headers_get_one(_self->response_headers, name);

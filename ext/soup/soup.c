@@ -60,6 +60,18 @@ Message_unset_request_header(VALUE self, VALUE __v_name);
 static VALUE
 Message_set_request_body(VALUE self, VALUE __v_type, VALUE body);
 static VALUE
+Message_set_response(VALUE self, VALUE __v_content_type, VALUE body);
+static VALUE
+Message_set_status(int __p_argc, VALUE *__p_argv, VALUE self);
+static VALUE
+Message_set_redirect(VALUE self, VALUE __v_status_code, VALUE __v_redirect_uri);
+static VALUE
+Message_is_keepalive_query(VALUE self);
+static VALUE
+Message_flags_equals(VALUE self, VALUE __v_flags);
+static VALUE
+Message_flags(VALUE self);
+static VALUE
 Message_get_response_header(VALUE self, VALUE __v_name);
 static VALUE
 Message_each_response_header(VALUE self);
@@ -225,7 +237,7 @@ Message_initialize(VALUE self, VALUE __v_method, VALUE __v_uri)
   __orig_method = method = ( NIL_P(__v_method) ? NULL : StringValuePtr(__v_method) );
   __orig_uri = uri = ( NIL_P(__v_uri) ? NULL : StringValuePtr(__v_uri) );
 
-#line 98 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 100 "/home/geoff/Projects/soup/ext/soup/soup.cr"
   INIT(self, soup_message_new(method, uri));
  
   return Qnil;
@@ -240,7 +252,7 @@ Message_set_request_header(VALUE self, VALUE __v_name, VALUE __v_value)
   __orig_name = name = ( NIL_P(__v_name) ? NULL : StringValuePtr(__v_name) );
   __orig_value = value = ( NIL_P(__v_value) ? NULL : StringValuePtr(__v_value) );
 
-#line 102 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 104 "/home/geoff/Projects/soup/ext/soup/soup.cr"
   soup_message_headers_replace(_self->request_headers, name, value);
  
   return self;
@@ -253,7 +265,7 @@ Message_unset_request_header(VALUE self, VALUE __v_name)
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
   __orig_name = name = ( NIL_P(__v_name) ? NULL : StringValuePtr(__v_name) );
 
-#line 106 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 108 "/home/geoff/Projects/soup/ext/soup/soup.cr"
   soup_message_headers_remove(_self->request_headers, name);
  
   return Qnil;
@@ -267,10 +279,104 @@ Message_set_request_body(VALUE self, VALUE __v_type, VALUE body)
   __orig_type = type = ( NIL_P(__v_type) ? NULL : StringValuePtr(__v_type) );
   Check_Type(body, T_STRING);
 
-#line 110 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 112 "/home/geoff/Projects/soup/ext/soup/soup.cr"
   soup_message_set_request(_self, type, SOUP_MEMORY_COPY, RSTRING_PTR(body), RSTRING_LEN(body));
  
   return self;
+}
+
+static VALUE
+Message_set_response(VALUE self, VALUE __v_content_type, VALUE body)
+{
+  char * content_type; char * __orig_content_type;
+  SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
+  __orig_content_type = content_type = ( NIL_P(__v_content_type) ? NULL : StringValuePtr(__v_content_type) );
+  Check_Type(body, T_STRING);
+
+#line 116 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+  soup_message_set_response(_self, content_type, SOUP_MEMORY_COPY, RSTRING_PTR(body), RSTRING_LEN(body));
+ 
+  return self;
+}
+
+static VALUE
+Message_set_status(int __p_argc, VALUE *__p_argv, VALUE self)
+{
+  VALUE __v_status_code = Qnil;
+  int status_code; int __orig_status_code;
+  VALUE __v_reason = Qnil;
+  char * reason; char * __orig_reason;
+  SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
+
+  /* Scan arguments */
+  rb_scan_args(__p_argc, __p_argv, "11",&__v_status_code, &__v_reason);
+
+  /* Set defaults */
+  __orig_status_code = status_code = NUM2INT(__v_status_code);
+
+  if (__p_argc > 1)
+    __orig_reason = reason = ( NIL_P(__v_reason) ? NULL : StringValuePtr(__v_reason) );
+  else
+    reason = NULL;
+
+
+#line 120 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+  if (reason) { soup_message_set_status_full(_self, status_code, reason);
+  } else { soup_message_set_status(_self, status_code);
+  }
+  return self;
+}
+
+static VALUE
+Message_set_redirect(VALUE self, VALUE __v_status_code, VALUE __v_redirect_uri)
+{
+  int status_code; int __orig_status_code;
+  char * redirect_uri; char * __orig_redirect_uri;
+  SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
+  __orig_status_code = status_code = NUM2INT(__v_status_code);
+  __orig_redirect_uri = redirect_uri = ( NIL_P(__v_redirect_uri) ? NULL : StringValuePtr(__v_redirect_uri) );
+
+#line 128 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+  soup_message_set_redirect(_self, status_code, redirect_uri);
+ 
+  return self;
+}
+
+static VALUE
+Message_is_keepalive_query(VALUE self)
+{
+  VALUE __p_retval = Qnil;
+  SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
+
+#line 132 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+  do { __p_retval =  ((soup_message_is_keepalive(_self)) ? Qtrue : Qfalse); goto out; } while(0);
+out:
+  return __p_retval;
+}
+
+static VALUE
+Message_flags_equals(VALUE self, VALUE __v_flags)
+{
+  SoupMessageFlags flags; SoupMessageFlags __orig_flags;
+  SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
+  __orig_flags = flags = RVAL2GFLAGS(__v_flags, SOUP_MESSAGE_FLAGS);
+
+#line 136 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+  soup_message_set_flags(_self, flags);
+ 
+  return __v_flags;
+}
+
+static VALUE
+Message_flags(VALUE self)
+{
+  VALUE __p_retval = Qnil;
+  SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
+
+#line 140 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+  do { __p_retval = GFLAGS2RVAL(soup_message_get_flags(_self), SOUP_MESSAGE_FLAGS); goto out; } while(0);
+out:
+  return __p_retval;
 }
 
 static VALUE
@@ -281,7 +387,7 @@ Message_get_response_header(VALUE self, VALUE __v_name)
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
   __orig_name = name = ( NIL_P(__v_name) ? NULL : StringValuePtr(__v_name) );
 
-#line 114 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 144 "/home/geoff/Projects/soup/ext/soup/soup.cr"
   do { __p_retval =  rb_str_new2(soup_message_headers_get_one(_self->response_headers, name)); goto out; } while(0);
 out:
   return __p_retval;
@@ -292,7 +398,7 @@ Message_each_response_header(VALUE self)
 {
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
 
-#line 118 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 148 "/home/geoff/Projects/soup/ext/soup/soup.cr"
 
   do {
   VALUE  block  =
@@ -312,7 +418,7 @@ Message_response_body(VALUE self)
   VALUE __p_retval = Qnil;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
 
-#line 124 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 154 "/home/geoff/Projects/soup/ext/soup/soup.cr"
 
   do {
   SoupBuffer * buffer  =
@@ -369,11 +475,19 @@ Init_soup(void)
   cURI = G_DEF_CLASS(SOUP_TYPE_URI, "URI", mSoup);
   rb_define_method(cURI, "initialize", URI_initialize, 1);
   rb_define_method(cURI, "to_s", URI_to_s, 0);
+  G_DEF_CLASS(SOUP_MESSAGE_FLAGS, "Flags", mSoup);
+  G_DEF_CONSTANTS(mSoup, SOUP_MESSAGE_FLAGS, "SOUP_MESSAGE_");
   cMessage = G_DEF_CLASS(SOUP_TYPE_MESSAGE, "Message", mSoup);
   rb_define_method(cMessage, "initialize", Message_initialize, 2);
   rb_define_method(cMessage, "set_request_header", Message_set_request_header, 2);
   rb_define_method(cMessage, "unset_request_header", Message_unset_request_header, 1);
   rb_define_method(cMessage, "set_request_body", Message_set_request_body, 2);
+  rb_define_method(cMessage, "set_response", Message_set_response, 2);
+  rb_define_method(cMessage, "set_status", Message_set_status, -1);
+  rb_define_method(cMessage, "set_redirect", Message_set_redirect, 2);
+  rb_define_method(cMessage, "is_keepalive?", Message_is_keepalive_query, 0);
+  rb_define_method(cMessage, "flags=", Message_flags_equals, 1);
+  rb_define_method(cMessage, "flags", Message_flags, 0);
   rb_define_method(cMessage, "get_response_header", Message_get_response_header, 1);
   rb_define_method(cMessage, "each_response_header", Message_each_response_header, 0);
   rb_define_method(cMessage, "response_body", Message_response_body, 0);
