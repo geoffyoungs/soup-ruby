@@ -1,0 +1,4 @@
+tmp/*
+pkg/*
+*.so
+x86_64-linux/*
