@@ -211,7 +211,6 @@ static VALUE flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD = Qnil;
 static VALUE flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED = Qnil;
 static VALUE flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED = Qnil;
 static VALUE flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION = Qnil;
-static VALUE flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT = Qnil;
 	static VALUE rubber_flagsMessageFlags_flags_inspect(VALUE value)
 {
 	FlagsData *data = NULL;
@@ -253,12 +252,6 @@ static VALUE flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT = Qnil;
 			rb_str_cat2(str, "new-connection");
 			c ++;
 		}
-		if ((data->value & SOUP_MESSAGE_IDEMPOTENT)==SOUP_MESSAGE_IDEMPOTENT) {
-			if (c>0)
-				rb_str_cat2(str, ", ");
-			rb_str_cat2(str, "idempotent");
-			c ++;
-		}
 	rb_str_cat2(str, " (");
 	sprintf(number, "%i", data->value);
 	rb_str_cat2(str, number);
@@ -284,7 +277,6 @@ static VALUE flags_MessageFlags_to_ruby(int value) { switch(value) {
     case SOUP_MESSAGE_CONTENT_DECODED: return flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED;
     case SOUP_MESSAGE_CERTIFICATE_TRUSTED: return flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED;
     case SOUP_MESSAGE_NEW_CONNECTION: return flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION;
-    case SOUP_MESSAGE_IDEMPOTENT: return flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT;
 	}; return make_flags_value(flagsMessageFlags, value, "various", "Various"); }
 	static int flags_ruby_to_MessageFlags(VALUE val) { return flags_value_to_int(val, flagsMessageFlags); }
 static VALUE cMessage;
@@ -741,9 +733,6 @@ Init_soup(void)
     flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_NEW_CONNECTION, "new-connection", "SOUP_MESSAGE_NEW_CONNECTION");
     rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION);
     rb_define_const(flagsMessageFlags, "NEW_CONNECTION", flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION);
-    flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_IDEMPOTENT, "idempotent", "SOUP_MESSAGE_IDEMPOTENT");
-    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT);
-    rb_define_const(flagsMessageFlags, "IDEMPOTENT", flagsMessageFlags_SOUP_MESSAGE_IDEMPOTENT);
   cMessage = G_DEF_CLASS(SOUP_TYPE_MESSAGE, "Message", mSoup);
   rb_define_method(cMessage, "initialize", Message_initialize, 2);
   rb_define_method(cMessage, "set_request_header", Message_set_request_header, 2);
