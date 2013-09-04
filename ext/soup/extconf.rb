@@ -19,37 +19,20 @@ end
 # Look for headers in {gem_root}/ext/{package}
 if use_gems
   %w[
- glib2 gdk_pixbuf2 atk gtk2].each do |package|
-    require package
-    if Gem.loaded_specs[package]
-      $CFLAGS += " -I" + Gem.loaded_specs[package].full_gem_path + "/ext/" + package
-    else
-      if fn = $".find { |n| n.sub(/[.](so|rb)$/,'') == package }
-        dr = $:.find { |d| File.exist?(File.join(d, fn)) }
-        pt = File.join(dr,fn) if dr && fn
-      else
-        pt = "??"
-      end
-      STDERR.puts "require '" + package + "' loaded '"+pt+"' instead of the gem - trying to continue, but build may fail"
-    end
+ glib2 gdk_pixbuf2 atk gtk2    ].each do |package|
+      require package
+      $CFLAGS += " -I"+Gem.loaded_specs[package].full_gem_path+"/ext/"+package
   end
 end
 if RbConfig::CONFIG.has_key?('rubyhdrdir')
-  $CFLAGS += " -I" + RbConfig::CONFIG['rubyhdrdir']+'/ruby'
+$CFLAGS += " -I" + RbConfig::CONFIG['rubyhdrdir']+'/ruby'
 end
 
 $CFLAGS += " -I."
 have_func("rb_errinfo")
 PKGConfig.have_package("gtk+-2.0") or exit(-1)
 PKGConfig.have_package("libsoup-2.4") or exit(-1)
-
-unless have_header("libsoup/soup.h")
-  paths = Gem.find_files("libsoup/soup.h")
-  paths.each do |path|
-    $CFLAGS += " '-I#{File.dirname(path)}'"
-  end
-  have_header("libsoup/soup.h") or exit -1
-end
+have_header("libsoup/soup.h") or exit(-1)
 
 STDOUT.print("checking for new allocation framework... ") # for ruby-1.7
 if Object.respond_to? :allocate

@@ -139,11 +139,7 @@ static VALUE rubber_flags_cmp(VALUE value, VALUE other)
 	VALUE a,b;
 	a = rb_funcall(value, rb_intern("to_i"), 0);
 	b = rb_funcall(other, rb_intern("to_i"), 0);
-#ifdef RB_NUM_COERCE_FUNCS_NEED_OPID
-	return rb_num_coerce_cmp(a, b, rb_intern("=="));
-#else
 	return rb_num_coerce_cmp(a, b);
-#endif
 }
 
 static VALUE rubber_flags_to_i(VALUE value)
@@ -210,7 +206,6 @@ static VALUE flagsMessageFlags_SOUP_MESSAGE_NO_REDIRECT = Qnil;
 static VALUE flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD = Qnil;
 static VALUE flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED = Qnil;
 static VALUE flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED = Qnil;
-static VALUE flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION = Qnil;
 	static VALUE rubber_flagsMessageFlags_flags_inspect(VALUE value)
 {
 	FlagsData *data = NULL;
@@ -246,12 +241,6 @@ static VALUE flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION = Qnil;
 			rb_str_cat2(str, "certificate-trusted");
 			c ++;
 		}
-		if ((data->value & SOUP_MESSAGE_NEW_CONNECTION)==SOUP_MESSAGE_NEW_CONNECTION) {
-			if (c>0)
-				rb_str_cat2(str, ", ");
-			rb_str_cat2(str, "new-connection");
-			c ++;
-		}
 	rb_str_cat2(str, " (");
 	sprintf(number, "%i", data->value);
 	rb_str_cat2(str, number);
@@ -276,7 +265,6 @@ static VALUE flags_MessageFlags_to_ruby(int value) { switch(value) {
     case SOUP_MESSAGE_CAN_REBUILD: return flagsMessageFlags_SOUP_MESSAGE_CAN_REBUILD;
     case SOUP_MESSAGE_CONTENT_DECODED: return flagsMessageFlags_SOUP_MESSAGE_CONTENT_DECODED;
     case SOUP_MESSAGE_CERTIFICATE_TRUSTED: return flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED;
-    case SOUP_MESSAGE_NEW_CONNECTION: return flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION;
 	}; return make_flags_value(flagsMessageFlags, value, "various", "Various"); }
 	static int flags_ruby_to_MessageFlags(VALUE val) { return flags_value_to_int(val, flagsMessageFlags); }
 static VALUE cMessage;
@@ -730,9 +718,6 @@ Init_soup(void)
     flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_CERTIFICATE_TRUSTED, "certificate-trusted", "SOUP_MESSAGE_CERTIFICATE_TRUSTED");
     rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED);
     rb_define_const(flagsMessageFlags, "CERTIFICATE_TRUSTED", flagsMessageFlags_SOUP_MESSAGE_CERTIFICATE_TRUSTED);
-    flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION = make_flags_value(flagsMessageFlags, SOUP_MESSAGE_NEW_CONNECTION, "new-connection", "SOUP_MESSAGE_NEW_CONNECTION");
-    rb_obj_freeze(flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION);
-    rb_define_const(flagsMessageFlags, "NEW_CONNECTION", flagsMessageFlags_SOUP_MESSAGE_NEW_CONNECTION);
   cMessage = G_DEF_CLASS(SOUP_TYPE_MESSAGE, "Message", mSoup);
   rb_define_method(cMessage, "initialize", Message_initialize, 2);
   rb_define_method(cMessage, "set_request_header", Message_set_request_header, 2);
