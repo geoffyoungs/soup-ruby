@@ -8,7 +8,6 @@ require 'rake/testtask'
 $: << './lib'
 
 require 'soup/version'
-exts = []
 
 namespace :prepare do
 FileList["ext/*/*.cr"].each do |cr|
@@ -29,6 +28,7 @@ spec = Gem::Specification.new do |s|
 	s.homepage = "http://github.com/geoffyoungs/soup-ruby"
 	s.summary = "Soup bindings using rubber-generate"
 	s.add_dependency("rubber-generate", ">= 0.0.17")
+	s.add_dependency("gtk2", ">= 3.0.0")
 	s.platform = Gem::Platform::RUBY
 	s.extensions = FileList["ext/*/extconf.rb"]
   s.licenses = ['The Ruby License']
@@ -40,6 +40,14 @@ e.g
 require 'gtk2'
 require 'soup'
 
+
+message = Soup::Message.new("GET", "http://www.example.com/")
+Soup::SessionAsync.new.queue(message) do |_sess,_mess|
+  puts "Got response"
+  Gtk.main_quit
+end
+
+Gtk.main
 EOF
 end
 Gem::PackageTask.new(spec) do |pkg|
