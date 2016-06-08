@@ -1,3 +1,5 @@
+source 'https://rubygems.org/'
+
 gem 'glib2'
 gem 'gtk2'
 

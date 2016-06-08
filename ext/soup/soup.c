@@ -1,9 +1,14 @@
 #pragma GCC diagnostic ignored "-Wunused-but-set-variable"
-/* Includes */
-#include <ruby.h>
-#include <stdlib.h>
-#include <stdio.h>
-#include <string.h>
+  /* Includes */
+  #include <ruby.h>
+  #include <stdlib.h>
+  #include <stdio.h>
+  #include <string.h>
+  #if defined GCC
+    #define OPTIONAL_ATTR __attribute__((unused))
+  #else
+    #define OPTIONAL_ATTR
+  #endif
 #include "libsoup/soup.h"
 
 /* Setup types */
@@ -33,23 +38,23 @@ RUBY_GTK2_VAR VALUE mGdk;
 static VALUE mSoup;
 static VALUE cSession;
 static VALUE
-Session_queue(VALUE self, VALUE __v_message);
+Session_queue(VALUE self OPTIONAL_ATTR , VALUE __v_message OPTIONAL_ATTR);
 static VALUE
-Session_send(VALUE self, VALUE __v_msg);
+Session_send(VALUE self OPTIONAL_ATTR , VALUE __v_msg OPTIONAL_ATTR);
 static VALUE
-Session_pause(VALUE self, VALUE __v_msg);
+Session_pause(VALUE self OPTIONAL_ATTR , VALUE __v_msg OPTIONAL_ATTR);
 static VALUE
-Session_unpause(VALUE self, VALUE __v_msg);
+Session_unpause(VALUE self OPTIONAL_ATTR , VALUE __v_msg OPTIONAL_ATTR);
 static VALUE
-Session_abort(VALUE self);
+Session_abort(VALUE self OPTIONAL_ATTR );
 static VALUE cSessionAsync;
 static VALUE
-SessionAsync_initialize(VALUE self);
+SessionAsync_initialize(VALUE self OPTIONAL_ATTR );
 static VALUE cURI;
 static VALUE
-URI_initialize(VALUE self, VALUE __v_uri_string);
+URI_initialize(VALUE self OPTIONAL_ATTR , VALUE __v_uri_string OPTIONAL_ATTR);
 static VALUE
-URI_to_s(VALUE self);
+URI_to_s(VALUE self OPTIONAL_ATTR );
 static VALUE flagsMessageFlags;
 
 static VALUE flagsBaseClass;
@@ -273,31 +278,31 @@ static VALUE flags_MessageFlags_to_ruby(int value) { switch(value) {
 	static int flags_ruby_to_MessageFlags(VALUE val) { return flags_value_to_int(val, flagsMessageFlags); }
 static VALUE cMessage;
 static VALUE
-Message_initialize(VALUE self, VALUE __v_method, VALUE __v_uri);
+Message_initialize(VALUE self OPTIONAL_ATTR , VALUE __v_method OPTIONAL_ATTR, VALUE __v_uri OPTIONAL_ATTR);
 static VALUE
-Message_set_request_header(VALUE self, VALUE __v_name, VALUE __v_value);
+Message_set_request_header(VALUE self OPTIONAL_ATTR , VALUE __v_name OPTIONAL_ATTR, VALUE __v_value OPTIONAL_ATTR);
 static VALUE
-Message_unset_request_header(VALUE self, VALUE __v_name);
+Message_unset_request_header(VALUE self OPTIONAL_ATTR , VALUE __v_name OPTIONAL_ATTR);
 static VALUE
-Message_set_request_body(VALUE self, VALUE __v_type, VALUE body);
+Message_set_request_body(VALUE self OPTIONAL_ATTR , VALUE __v_type OPTIONAL_ATTR, VALUE body OPTIONAL_ATTR);
 static VALUE
-Message_set_response(VALUE self, VALUE __v_content_type, VALUE body);
+Message_set_response(VALUE self OPTIONAL_ATTR , VALUE __v_content_type OPTIONAL_ATTR, VALUE body OPTIONAL_ATTR);
 static VALUE
 Message_set_status(int __p_argc, VALUE *__p_argv, VALUE self);
 static VALUE
-Message_set_redirect(VALUE self, VALUE __v_status_code, VALUE __v_redirect_uri);
+Message_set_redirect(VALUE self OPTIONAL_ATTR , VALUE __v_status_code OPTIONAL_ATTR, VALUE __v_redirect_uri OPTIONAL_ATTR);
 static VALUE
-Message_is_keepalive_query(VALUE self);
+Message_is_keepalive_query(VALUE self OPTIONAL_ATTR );
 static VALUE
-Message_flags_equals(VALUE self, VALUE __v_flags);
+Message_flags_equals(VALUE self OPTIONAL_ATTR , VALUE __v_flags OPTIONAL_ATTR);
 static VALUE
-Message_flags(VALUE self);
+Message_flags(VALUE self OPTIONAL_ATTR );
 static VALUE
-Message_get_response_header(VALUE self, VALUE __v_name);
+Message_get_response_header(VALUE self OPTIONAL_ATTR , VALUE __v_name OPTIONAL_ATTR);
 static VALUE
-Message_each_response_header(VALUE self);
+Message_each_response_header(VALUE self OPTIONAL_ATTR );
 static VALUE
-Message_response_body(VALUE self);
+Message_response_body(VALUE self OPTIONAL_ATTR );
 static VALUE _gcpool_RubyFunc = Qnil;
 static void __gcpool_RubyFunc_add(VALUE val);
 static void __gcpool_RubyFunc_del(VALUE val);
@@ -344,13 +349,13 @@ static void each_header(const char *name, const char *value, gpointer user_data)
 
 /* Code */
 static VALUE
-Session_queue(VALUE self, VALUE __v_message)
+Session_queue(VALUE self OPTIONAL_ATTR , VALUE __v_message OPTIONAL_ATTR)
 {
   SoupMessage * message; SoupMessage * __orig_message;
   SoupSession *_self = ((SoupSession*)RVAL2GOBJ(self));
   __orig_message = message = RVAL2GOBJ(__v_message);
 
-#line 52 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 52 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
 
   do {
   if (rb_block_given_p()) { VALUE  block  =
@@ -366,106 +371,106 @@ Session_queue(VALUE self, VALUE __v_message)
 }
 
 static VALUE
-Session_send(VALUE self, VALUE __v_msg)
+Session_send(VALUE self OPTIONAL_ATTR , VALUE __v_msg OPTIONAL_ATTR)
 {
-  VALUE __p_retval = Qnil;
+  VALUE __p_retval OPTIONAL_ATTR = Qnil;
   SoupMessage * msg; SoupMessage * __orig_msg;
   SoupSession *_self = ((SoupSession*)RVAL2GOBJ(self));
   __orig_msg = msg = RVAL2GOBJ(__v_msg);
 
-#line 62 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 62 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   do { __p_retval =  UINT2NUM(soup_session_send_message(_self, msg)); goto out; } while(0);
 out:
   return __p_retval;
 }
 
 static VALUE
-Session_pause(VALUE self, VALUE __v_msg)
+Session_pause(VALUE self OPTIONAL_ATTR , VALUE __v_msg OPTIONAL_ATTR)
 {
   SoupMessage * msg; SoupMessage * __orig_msg;
   SoupSession *_self = ((SoupSession*)RVAL2GOBJ(self));
   __orig_msg = msg = RVAL2GOBJ(__v_msg);
 
-#line 66 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 66 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_session_pause_message(_self, msg);
  
   return Qnil;
 }
 
 static VALUE
-Session_unpause(VALUE self, VALUE __v_msg)
+Session_unpause(VALUE self OPTIONAL_ATTR , VALUE __v_msg OPTIONAL_ATTR)
 {
   SoupMessage * msg; SoupMessage * __orig_msg;
   SoupSession *_self = ((SoupSession*)RVAL2GOBJ(self));
   __orig_msg = msg = RVAL2GOBJ(__v_msg);
 
-#line 70 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 70 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_session_unpause_message(_self, msg);
  
   return Qnil;
 }
 
 static VALUE
-Session_abort(VALUE self)
+Session_abort(VALUE self OPTIONAL_ATTR )
 {
   SoupSession *_self = ((SoupSession*)RVAL2GOBJ(self));
 
-#line 74 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 74 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_session_abort(_self);
  
   return Qnil;
 }
 
 static VALUE
-SessionAsync_initialize(VALUE self)
+SessionAsync_initialize(VALUE self OPTIONAL_ATTR )
 {
 
-#line 81 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 81 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   INIT(self, soup_session_async_new());
  
   return Qnil;
 }
 
 static VALUE
-URI_initialize(VALUE self, VALUE __v_uri_string)
+URI_initialize(VALUE self OPTIONAL_ATTR , VALUE __v_uri_string OPTIONAL_ATTR)
 {
   char * uri_string; char * __orig_uri_string;
   __orig_uri_string = uri_string = ( NIL_P(__v_uri_string) ? NULL : StringValuePtr(__v_uri_string) );
 
-#line 88 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 88 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   INIT(self, soup_uri_new(uri_string));
  
   return Qnil;
 }
 
 static VALUE
-URI_to_s(VALUE self)
+URI_to_s(VALUE self OPTIONAL_ATTR )
 {
-  VALUE __p_retval = Qnil;
+  VALUE __p_retval OPTIONAL_ATTR = Qnil;
   SoupURI * _self = ((SoupURI *)RVAL2BOXED(self, SOUP_TYPE_URI));
 
-#line 91 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 91 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   do { __p_retval =  rb_str_new2(soup_uri_to_string(_self, FALSE)); goto out; } while(0);
 out:
   return __p_retval;
 }
 
 static VALUE
-Message_initialize(VALUE self, VALUE __v_method, VALUE __v_uri)
+Message_initialize(VALUE self OPTIONAL_ATTR , VALUE __v_method OPTIONAL_ATTR, VALUE __v_uri OPTIONAL_ATTR)
 {
   char * method; char * __orig_method;
   char * uri; char * __orig_uri;
   __orig_method = method = ( NIL_P(__v_method) ? NULL : StringValuePtr(__v_method) );
   __orig_uri = uri = ( NIL_P(__v_uri) ? NULL : StringValuePtr(__v_uri) );
 
-#line 100 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 100 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   INIT(self, soup_message_new(method, uri));
  
   return Qnil;
 }
 
 static VALUE
-Message_set_request_header(VALUE self, VALUE __v_name, VALUE __v_value)
+Message_set_request_header(VALUE self OPTIONAL_ATTR , VALUE __v_name OPTIONAL_ATTR, VALUE __v_value OPTIONAL_ATTR)
 {
   char * name; char * __orig_name;
   char * value; char * __orig_value;
@@ -473,48 +478,48 @@ Message_set_request_header(VALUE self, VALUE __v_name, VALUE __v_value)
   __orig_name = name = ( NIL_P(__v_name) ? NULL : StringValuePtr(__v_name) );
   __orig_value = value = ( NIL_P(__v_value) ? NULL : StringValuePtr(__v_value) );
 
-#line 104 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 104 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_message_headers_replace(_self->request_headers, name, value);
  
   return self;
 }
 
 static VALUE
-Message_unset_request_header(VALUE self, VALUE __v_name)
+Message_unset_request_header(VALUE self OPTIONAL_ATTR , VALUE __v_name OPTIONAL_ATTR)
 {
   char * name; char * __orig_name;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
   __orig_name = name = ( NIL_P(__v_name) ? NULL : StringValuePtr(__v_name) );
 
-#line 108 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 108 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_message_headers_remove(_self->request_headers, name);
  
   return Qnil;
 }
 
 static VALUE
-Message_set_request_body(VALUE self, VALUE __v_type, VALUE body)
+Message_set_request_body(VALUE self OPTIONAL_ATTR , VALUE __v_type OPTIONAL_ATTR, VALUE body OPTIONAL_ATTR)
 {
   char * type; char * __orig_type;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
   __orig_type = type = ( NIL_P(__v_type) ? NULL : StringValuePtr(__v_type) );
   Check_Type(body, T_STRING);
 
-#line 112 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 112 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_message_set_request(_self, type, SOUP_MEMORY_COPY, RSTRING_PTR(body), RSTRING_LEN(body));
  
   return self;
 }
 
 static VALUE
-Message_set_response(VALUE self, VALUE __v_content_type, VALUE body)
+Message_set_response(VALUE self OPTIONAL_ATTR , VALUE __v_content_type OPTIONAL_ATTR, VALUE body OPTIONAL_ATTR)
 {
   char * content_type; char * __orig_content_type;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
   __orig_content_type = content_type = ( NIL_P(__v_content_type) ? NULL : StringValuePtr(__v_content_type) );
   Check_Type(body, T_STRING);
 
-#line 116 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 116 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_message_set_response(_self, content_type, SOUP_MEMORY_COPY, RSTRING_PTR(body), RSTRING_LEN(body));
  
   return self;
@@ -541,7 +546,7 @@ Message_set_status(int __p_argc, VALUE *__p_argv, VALUE self)
     reason = NULL;
 
 
-#line 120 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 120 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   if (reason) { soup_message_set_status_full(_self, status_code, reason);
   } else { soup_message_set_status(_self, status_code);
   }
@@ -549,7 +554,7 @@ Message_set_status(int __p_argc, VALUE *__p_argv, VALUE self)
 }
 
 static VALUE
-Message_set_redirect(VALUE self, VALUE __v_status_code, VALUE __v_redirect_uri)
+Message_set_redirect(VALUE self OPTIONAL_ATTR , VALUE __v_status_code OPTIONAL_ATTR, VALUE __v_redirect_uri OPTIONAL_ATTR)
 {
   int status_code; int __orig_status_code;
   char * redirect_uri; char * __orig_redirect_uri;
@@ -557,69 +562,69 @@ Message_set_redirect(VALUE self, VALUE __v_status_code, VALUE __v_redirect_uri)
   __orig_status_code = status_code = NUM2INT(__v_status_code);
   __orig_redirect_uri = redirect_uri = ( NIL_P(__v_redirect_uri) ? NULL : StringValuePtr(__v_redirect_uri) );
 
-#line 128 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 128 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_message_set_redirect(_self, status_code, redirect_uri);
  
   return self;
 }
 
 static VALUE
-Message_is_keepalive_query(VALUE self)
+Message_is_keepalive_query(VALUE self OPTIONAL_ATTR )
 {
-  VALUE __p_retval = Qnil;
+  VALUE __p_retval OPTIONAL_ATTR = Qnil;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
 
-#line 132 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 132 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   do { __p_retval =  ((soup_message_is_keepalive(_self)) ? Qtrue : Qfalse); goto out; } while(0);
 out:
   return __p_retval;
 }
 
 static VALUE
-Message_flags_equals(VALUE self, VALUE __v_flags)
+Message_flags_equals(VALUE self OPTIONAL_ATTR , VALUE __v_flags OPTIONAL_ATTR)
 {
   MessageFlags flags; MessageFlags __orig_flags;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
   __orig_flags = flags = flags_ruby_to_MessageFlags((__v_flags));
 
-#line 136 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 136 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   soup_message_set_flags(_self, flags);
  
   return __v_flags;
 }
 
 static VALUE
-Message_flags(VALUE self)
+Message_flags(VALUE self OPTIONAL_ATTR )
 {
-  VALUE __p_retval = Qnil;
+  VALUE __p_retval OPTIONAL_ATTR = Qnil;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
 
-#line 140 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 140 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   do { __p_retval = flags_MessageFlags_to_ruby((soup_message_get_flags(_self))); goto out; } while(0);
 out:
   return __p_retval;
 }
 
 static VALUE
-Message_get_response_header(VALUE self, VALUE __v_name)
+Message_get_response_header(VALUE self OPTIONAL_ATTR , VALUE __v_name OPTIONAL_ATTR)
 {
-  VALUE __p_retval = Qnil;
+  VALUE __p_retval OPTIONAL_ATTR = Qnil;
   char * name; char * __orig_name;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
   __orig_name = name = ( NIL_P(__v_name) ? NULL : StringValuePtr(__v_name) );
 
-#line 144 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 144 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
   do { __p_retval =  rb_str_new2(soup_message_headers_get_one(_self->response_headers, name)); goto out; } while(0);
 out:
   return __p_retval;
 }
 
 static VALUE
-Message_each_response_header(VALUE self)
+Message_each_response_header(VALUE self OPTIONAL_ATTR )
 {
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
 
-#line 148 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 148 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
 
   do {
   VALUE  block  =
@@ -634,12 +639,12 @@ Message_each_response_header(VALUE self)
 }
 
 static VALUE
-Message_response_body(VALUE self)
+Message_response_body(VALUE self OPTIONAL_ATTR )
 {
-  VALUE __p_retval = Qnil;
+  VALUE __p_retval OPTIONAL_ATTR = Qnil;
   SoupMessage *_self = ((SoupMessage*)RVAL2GOBJ(self));
 
-#line 154 "/home/geoff/Projects/soup/ext/soup/soup.cr"
+#line 154 "/home/geoff/Projects/soup-ruby/ext/soup/soup.cr"
 
   do {
   SoupBuffer * buffer  =
